@@ -4,106 +4,77 @@
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F)
 ![WebSocket](https://img.shields.io/badge/WebSocket-Real--Time-blue)
 ![JUnit5](https://img.shields.io/badge/JUnit-5-red)
-![Mockito](https://img.shields.io/badge/Mockito-Testing-green)
 
 A scalable, event-driven multiplayer Bingo backend built using **Spring Boot** and **WebSockets**.
-
-## ✨ Features
-
-- Create and join multiplayer Bingo rooms
-- Real-time gameplay using WebSockets
-- Turn-based number calling
-- Automatic Bingo board generation
-- Server-side Bingo validation
-- Event-driven architecture
-- Domain-driven design
-- Comprehensive unit testing
 
 ## 🏗 Architecture
 
 ```mermaid
-flowchart TB
-    Client["🎮 WebSocket Clients"]
+flowchart LR
+    Client["WebSocket Client"]
 
-    subgraph Transport["Transport Layer"]
+    subgraph Transport
         Handler["BingoWebSocketHandler"]
         Dispatcher["InboundMessageDispatcher"]
-        Serializer["MessageSerializer"]
     end
 
-    subgraph Application["Application Layer"]
+    subgraph Application
         Service["RoomService"]
         Publisher["BingoEventPublisher"]
     end
 
-    subgraph Domain["Domain Layer"]
+    subgraph Domain
         Room["Room"]
         Game["BingoGame"]
         Board["BingoBoard"]
-        Player["Player"]
     end
 
-    subgraph Messaging["Messaging Layer"]
-        Mapper["OutboundMessageMapper"]
+    subgraph Messaging
         Listeners["Event Listeners"]
+        Mapper["OutboundMessageMapper"]
+        Serializer["MessageSerializer"]
     end
 
-    subgraph Infrastructure["Infrastructure"]
+    subgraph Infrastructure
         Repository["RoomRepository"]
         Registry["SessionRegistry"]
     end
 
-    Client -->|Inbound JSON| Handler
+    Client --> Handler
     Handler --> Dispatcher
     Dispatcher --> Service
     Service --> Room
     Room --> Game
     Game --> Board
-    Room --> Player
     Service --> Repository
-    Service -->|Publishes| Publisher
+    Service --> Publisher
     Publisher --> Listeners
     Listeners --> Mapper
     Mapper --> Serializer
     Serializer --> Registry
-    Registry -->|Outbound JSON| Client
+    Registry --> Client
 ```
 
 ## 📡 Event Flow
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant WS as WebSocketHandler
-    participant Dispatcher
-    participant Service as RoomService
-    participant Publisher
-    participant Listener
-    participant Mapper
-    participant Registry
-    Client ->> WS: CREATE_ROOM
-    WS ->> Dispatcher: Dispatch Command
-    Dispatcher ->> Service: createRoom()
-    Service ->> Publisher: RoomCreatedEvent
-    Publisher ->> Listener: onEvent()
-    Listener ->> Mapper: map(event)
-    Mapper -->> Listener: OutboundMessage
-    Listener ->> Registry: fetchRoomSessions()
-    Listener ->> Client: ROOM_CREATED
+    participant C as Client
+    participant W as WebSocketHandler
+    participant D as Dispatcher
+    participant S as RoomService
+    participant P as EventPublisher
+    participant L as EventListener
+    participant M as Mapper
+    participant R as SessionRegistry
+    C ->> W: CREATE_ROOM
+    W ->> D: Dispatch
+    D ->> S: createRoom()
+    S ->> P: publish(RoomCreatedEvent)
+    P ->> L: onEvent()
+    L ->> M: map(event)
+    M -->> L: OutboundMessage
+    L ->> R: fetchRoomSessions()
+    R -->> L: Sessions
+    L -->> C: ROOM_CREATED
 ```
-
-## 🚀 Running
-
-```bash
-mvn clean install
-mvn spring-boot:run
-```
-
-## 🧪 Testing
-
-- Domain tests
-- RoomService tests
-- SessionRegistry tests
-- OutboundMessageMapper tests
-- Event Listener tests
-- WebSocket tests
