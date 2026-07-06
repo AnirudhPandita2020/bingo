@@ -41,6 +41,7 @@ flowchart LR
         Room["Room"]
         Game["BingoGame"]
         Board["BingoBoard"]
+        Player["Player"]
     end
     subgraph Messaging
         Listeners["Event Listeners"]
@@ -56,6 +57,7 @@ flowchart LR
     Dispatcher --> Service
     Service --> Room
     Room --> Game
+    Room --> Player
     Game --> Board
     Service --> Repository
     Service --> Publisher
