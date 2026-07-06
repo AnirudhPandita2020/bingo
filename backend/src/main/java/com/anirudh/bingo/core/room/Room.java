@@ -78,7 +78,7 @@ public final class Room {
      * If the room becomes empty, it is marked as closed.
      * </p>
      *
-     * @param player player leaving the room
+     * @param playerId player leaving the room
      */
     public synchronized Player leave(String playerId) {
         Assert.notNull(playerId, "playerId must not be null");

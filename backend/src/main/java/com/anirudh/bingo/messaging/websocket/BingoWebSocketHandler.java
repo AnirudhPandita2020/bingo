@@ -15,12 +15,12 @@ public class BingoWebSocketHandler extends TextWebSocketHandler {
     private final InboundMessageDispatcher inboundMessageDispatcher;
 
     @Override
-    public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(@NonNull WebSocketSession session) {
         SessionRegistry.register(session);
     }
 
     @Override
-    public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) throws Exception {
+    public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) {
         SessionRegistry.purge(session.getId());
         String playerId = session.getId();
         var roomId = SessionRegistry.findRoomId(playerId);
@@ -28,7 +28,7 @@ public class BingoWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    protected void handleTextMessage(@NonNull WebSocketSession session, @NonNull TextMessage message) throws Exception {
+    protected void handleTextMessage(@NonNull WebSocketSession session, @NonNull TextMessage message) {
         inboundMessageDispatcher.dispatch(session, message.getPayload());
     }
 }
