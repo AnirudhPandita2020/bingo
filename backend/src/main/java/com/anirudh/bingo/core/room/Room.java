@@ -87,6 +87,13 @@ public final class Room {
         }
 
         var player = players.remove(playerId);
+        if (players.size() == 1) {
+            // Minimum number of players required
+            bingoGame = null;
+            roomStatus = RoomStatus.OPEN;
+            return player;
+        }
+
         if (players.isEmpty()) {
             hostPlayerId = null;
             roomStatus = RoomStatus.CLOSED;
